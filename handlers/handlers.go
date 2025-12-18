@@ -143,3 +143,57 @@ func ToYAML(raw string) (string, error) {
 	}
 	return string(b), nil
 }
+
+// ExtractKeyJSON finds all values for a key and returns them as JSON.
+// If multiple values are found, it returns an array of objects {key: value}; if one, it returns a single object.
+func ExtractKeyJSON(raw, key string) (string, error) {
+	if raw == "" {
+		return "", errors.New("no JSON provided")
+	}
+	if key == "" {
+		return "", errors.New("no key provided")
+	}
+	var payload any
+	if err := json.Unmarshal([]byte(raw), &payload); err != nil {
+		return "", err
+	}
+
+	var values []any
+	collectValues(payload, key, &values)
+	if len(values) == 0 {
+		return "", errors.New("key not found")
+	}
+
+	var out any
+	if len(values) == 1 {
+		out = map[string]any{key: values[0]}
+	} else {
+		arr := make([]map[string]any, 0, len(values))
+		for _, v := range values {
+			arr = append(arr, map[string]any{key: v})
+		}
+		out = arr
+	}
+
+	b, err := json.MarshalIndent(out, "", "  ")
+	if err != nil {
+		return "", err
+	}
+	return string(b), nil
+}
+
+func collectValues(node any, key string, results *[]any) {
+	switch val := node.(type) {
+	case map[string]any:
+		for k, v := range val {
+			if k == key {
+				*results = append(*results, v)
+			}
+			collectValues(v, key, results)
+		}
+	case []any:
+		for _, item := range val {
+			collectValues(item, key, results)
+		}
+	}
+}

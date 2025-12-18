@@ -105,6 +105,21 @@ func main() {
 		}
 	})
 
+	r.POST("/extract/key", func(c *gin.Context) {
+		rawJSON := c.PostForm("jsonInput")
+		key := c.PostForm("key")
+		out, err := handlers.ExtractKeyJSON(rawJSON, key)
+		data := PageData{RawInput: rawJSON, Key: key, Formatted: out}
+		if err != nil {
+			data.Error = err.Error()
+		}
+		c.Status(http.StatusOK)
+		c.Header("Content-Type", "text/html; charset=utf-8")
+		if err := tmpl.Execute(c.Writer, data); err != nil {
+			c.String(http.StatusInternalServerError, "template error")
+		}
+	})
+
 	r.GET("/healthz", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
 	})

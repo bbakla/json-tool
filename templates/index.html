@@ -29,9 +29,9 @@
     <form method="POST" action="/format" class="row g-3 mb-4">
       <div class="col-12 col-lg-6">
         <div class="card shadow-sm h-100">
+          <div class="card-header bg-white fw-semibold">JSON Input</div>
           <div class="card-body">
             <div class="mb-3">
-              <label for="jsonInput" class="form-label fw-semibold">JSON Input</label>
               <textarea id="jsonInput" name="jsonInput" rows="16" class="form-control font-mono text-sm shadow-none" placeholder="Paste JSON here">{{.RawInput}}</textarea>
             </div>
             <div class="d-flex flex-wrap gap-2 justify-content-end">
@@ -67,7 +67,10 @@
               <label for="key" class="form-label fw-semibold">Key to find (optional)</label>
               <input id="key" name="key" type="text" value="{{.Key}}" class="form-control" placeholder="e.g. name">
               <p class="form-text text-muted mb-2">Case-sensitive exact key match.</p>
-              <button type="submit" formaction="/find/key" class="btn btn-outline-primary btn-sm">Find Key</button>
+              <div class="d-flex flex-wrap gap-2">
+                <button type="submit" formaction="/find/key" class="btn btn-outline-primary btn-sm">Find Key</button>
+                <button type="submit" formaction="/extract/key" class="btn btn-outline-secondary btn-sm">Extract as JSON</button>
+              </div>
             </div>
             <div>
               <div class="d-flex align-items-center justify-content-between mb-2">
