@@ -115,7 +115,7 @@ func valueMatches(v any, target string) bool {
 // Minify compacts JSON without whitespace.
 func Minify(raw string) (string, error) {
 	if raw == "" {
-		return "", errors.New("No JSON providedddd")
+		return "", errors.New("no JSON provided")
 	}
 	var payload any
 	if err := json.Unmarshal([]byte(raw), &payload); err != nil {

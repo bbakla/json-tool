@@ -22,10 +22,31 @@ type PageData struct {
 	Error      string
 }
 
-func render(tmpl *template.Template, c *gin.Context, rawJSON, key, value string) {
-	formatted, matches, keyMatches, err := handlers.Process(rawJSON, key, value)
+// App encapsulates dependencies for HTTP handlers.
+type App struct {
+	tmpl *template.Template
+}
+
+func (a *App) renderPage(c *gin.Context, data PageData, status int) {
+	c.Status(status)
+	c.Header("Content-Type", "text/html; charset=utf-8")
+	if err := a.tmpl.ExecuteTemplate(c.Writer, "base", data); err != nil {
+		c.String(http.StatusInternalServerError, "template error")
+	}
+}
+
+func (a *App) handleIndex(c *gin.Context) {
+	a.renderPage(c, PageData{}, http.StatusOK)
+}
+
+func (a *App) handleFormat(c *gin.Context) {
+	raw := c.PostForm("jsonInput")
+	key := c.PostForm("key")
+	value := c.PostForm("value")
+
+	formatted, matches, keyMatches, err := handlers.Process(raw, key, value)
 	data := PageData{
-		RawInput:   rawJSON,
+		RawInput:   raw,
 		Key:        key,
 		Value:      value,
 		Formatted:  formatted,
@@ -34,95 +55,100 @@ func render(tmpl *template.Template, c *gin.Context, rawJSON, key, value string)
 	}
 	if err != nil {
 		data.Error = err.Error()
+		a.renderPage(c, data, http.StatusBadRequest)
+		return
 	}
-	c.Status(http.StatusOK)
-	c.Header("Content-Type", "text/html; charset=utf-8")
-	if err := tmpl.Execute(c.Writer, data); err != nil {
-		c.String(http.StatusInternalServerError, "template error")
+	a.renderPage(c, data, http.StatusOK)
+}
+
+func (a *App) handleFindKey(c *gin.Context) {
+	raw := c.PostForm("jsonInput")
+	key := c.PostForm("key")
+	formatted, matches, _, err := handlers.Process(raw, key, "")
+	data := PageData{RawInput: raw, Key: key, Formatted: formatted, Matches: matches}
+	if err != nil {
+		data.Error = err.Error()
+		a.renderPage(c, data, http.StatusBadRequest)
+		return
 	}
+	a.renderPage(c, data, http.StatusOK)
+}
+
+func (a *App) handleFindValue(c *gin.Context) {
+	raw := c.PostForm("jsonInput")
+	value := c.PostForm("value")
+	formatted, _, keyMatches, err := handlers.Process(raw, "", value)
+	data := PageData{RawInput: raw, Value: value, Formatted: formatted, KeyMatches: keyMatches}
+	if err != nil {
+		data.Error = err.Error()
+		a.renderPage(c, data, http.StatusBadRequest)
+		return
+	}
+	a.renderPage(c, data, http.StatusOK)
+}
+
+func (a *App) handleMinify(c *gin.Context) {
+	raw := c.PostForm("jsonInput")
+	minified, err := handlers.Minify(raw)
+	data := PageData{RawInput: raw, Formatted: minified}
+	if err != nil {
+		data.Error = err.Error()
+		a.renderPage(c, data, http.StatusBadRequest)
+		return
+	}
+	a.renderPage(c, data, http.StatusOK)
+}
+
+func (a *App) handleToYAML(c *gin.Context) {
+	raw := c.PostForm("jsonInput")
+	out, err := handlers.ToYAML(raw)
+	data := PageData{RawInput: raw, Formatted: out}
+	if err != nil {
+		data.Error = err.Error()
+		a.renderPage(c, data, http.StatusBadRequest)
+		return
+	}
+	a.renderPage(c, data, http.StatusOK)
+}
+
+func (a *App) handleExtractKey(c *gin.Context) {
+	raw := c.PostForm("jsonInput")
+	key := c.PostForm("key")
+	out, err := handlers.ExtractKeyJSON(raw, key)
+	data := PageData{RawInput: raw, Key: key, Formatted: out}
+	if err != nil {
+		data.Error = err.Error()
+		a.renderPage(c, data, http.StatusBadRequest)
+		return
+	}
+	a.renderPage(c, data, http.StatusOK)
+}
+
+func (a *App) handleHealth(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"status": "ok"})
 }
 
 func main() {
-	tmplPath := filepath.Join("templates", "index.html")
-	tmpl := template.Must(template.ParseFiles(tmplPath))
+	tmplPath := filepath.Join("templates", "layout.html")
+	contentPath := filepath.Join("templates", "index.html")
+	tmpl := template.Must(template.ParseFiles(tmplPath, contentPath))
+
+	app := &App{tmpl: tmpl}
 
 	r := gin.Default()
 	r.Static("/static", "static")
 
-	r.GET("/", func(c *gin.Context) {
-		c.Status(http.StatusOK)
-		c.Header("Content-Type", "text/html; charset=utf-8")
-		if err := tmpl.Execute(c.Writer, PageData{}); err != nil {
-			c.String(http.StatusInternalServerError, "template error")
-		}
-	})
+	r.GET("/", app.handleIndex)
+	r.NoRoute(app.handleIndex)
 
-	r.NoRoute(func(c *gin.Context) {
-		c.Status(http.StatusOK)
-		c.Header("Content-Type", "text/html; charset=utf-8")
-		if err := tmpl.Execute(c.Writer, PageData{}); err != nil {
-			c.String(http.StatusInternalServerError, "template error")
-		}
-	})
+	r.POST("/format", app.handleFormat)
+	r.POST("/find/key", app.handleFindKey)
+	r.POST("/find/value", app.handleFindValue)
+	r.POST("/minify", app.handleMinify)
+	r.POST("/toyaml", app.handleToYAML)
+	r.POST("/extract/key", app.handleExtractKey)
 
-	r.POST("/format", func(c *gin.Context) {
-		render(tmpl, c, c.PostForm("jsonInput"), c.PostForm("key"), c.PostForm("value"))
-	})
-
-	r.POST("/find/key", func(c *gin.Context) {
-		render(tmpl, c, c.PostForm("jsonInput"), c.PostForm("key"), "")
-	})
-
-	r.POST("/find/value", func(c *gin.Context) {
-		render(tmpl, c, c.PostForm("jsonInput"), "", c.PostForm("value"))
-	})
-
-	r.POST("/minify", func(c *gin.Context) {
-		rawJSON := c.PostForm("jsonInput")
-		minified, err := handlers.Minify(rawJSON)
-		data := PageData{RawInput: rawJSON, Formatted: minified}
-		if err != nil {
-			data.Error = err.Error()
-		}
-		c.Status(http.StatusOK)
-		c.Header("Content-Type", "text/html; charset=utf-8")
-		if err := tmpl.Execute(c.Writer, data); err != nil {
-			c.String(http.StatusInternalServerError, "template error")
-		}
-	})
-
-	r.POST("/toyaml", func(c *gin.Context) {
-		rawJSON := c.PostForm("jsonInput")
-		yamlOut, err := handlers.ToYAML(rawJSON)
-		data := PageData{RawInput: rawJSON, Formatted: yamlOut}
-		if err != nil {
-			data.Error = err.Error()
-		}
-		c.Status(http.StatusOK)
-		c.Header("Content-Type", "text/html; charset=utf-8")
-		if err := tmpl.Execute(c.Writer, data); err != nil {
-			c.String(http.StatusInternalServerError, "template error")
-		}
-	})
-
-	r.POST("/extract/key", func(c *gin.Context) {
-		rawJSON := c.PostForm("jsonInput")
-		key := c.PostForm("key")
-		out, err := handlers.ExtractKeyJSON(rawJSON, key)
-		data := PageData{RawInput: rawJSON, Key: key, Formatted: out}
-		if err != nil {
-			data.Error = err.Error()
-		}
-		c.Status(http.StatusOK)
-		c.Header("Content-Type", "text/html; charset=utf-8")
-		if err := tmpl.Execute(c.Writer, data); err != nil {
-			c.String(http.StatusInternalServerError, "template error")
-		}
-	})
-
-	r.GET("/healthz", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{"status": "ok"})
-	})
+	r.GET("/healthz", app.handleHealth)
 
 	log.Println("listening on http://localhost:8888")
 	if err := r.Run(":8888"); err != nil {
