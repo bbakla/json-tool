@@ -77,6 +77,34 @@ func main() {
 		render(tmpl, c, c.PostForm("jsonInput"), "", c.PostForm("value"))
 	})
 
+	r.POST("/minify", func(c *gin.Context) {
+		rawJSON := c.PostForm("jsonInput")
+		minified, err := handlers.Minify(rawJSON)
+		data := PageData{RawInput: rawJSON, Formatted: minified}
+		if err != nil {
+			data.Error = err.Error()
+		}
+		c.Status(http.StatusOK)
+		c.Header("Content-Type", "text/html; charset=utf-8")
+		if err := tmpl.Execute(c.Writer, data); err != nil {
+			c.String(http.StatusInternalServerError, "template error")
+		}
+	})
+
+	r.POST("/toyaml", func(c *gin.Context) {
+		rawJSON := c.PostForm("jsonInput")
+		yamlOut, err := handlers.ToYAML(rawJSON)
+		data := PageData{RawInput: rawJSON, Formatted: yamlOut}
+		if err != nil {
+			data.Error = err.Error()
+		}
+		c.Status(http.StatusOK)
+		c.Header("Content-Type", "text/html; charset=utf-8")
+		if err := tmpl.Execute(c.Writer, data); err != nil {
+			c.String(http.StatusInternalServerError, "template error")
+		}
+	})
+
 	r.GET("/healthz", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
 	})

@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"sort"
+
+	"gopkg.in/yaml.v3"
 )
 
 // Process parses JSON, pretty-prints it, and finds values for the provided key as well as keys for the provided value.
@@ -108,4 +110,36 @@ func valueMatches(v any, target string) bool {
 		}
 		return string(b) == target
 	}
+}
+
+// Minify compacts JSON without whitespace.
+func Minify(raw string) (string, error) {
+	if raw == "" {
+		return "", errors.New("No JSON providedddd")
+	}
+	var payload any
+	if err := json.Unmarshal([]byte(raw), &payload); err != nil {
+		return "", err
+	}
+	b, err := json.Marshal(payload)
+	if err != nil {
+		return "", err
+	}
+	return string(b), nil
+}
+
+// ToYAML converts JSON into a YAML string.
+func ToYAML(raw string) (string, error) {
+	if raw == "" {
+		return "", errors.New("no JSON provided")
+	}
+	var payload any
+	if err := json.Unmarshal([]byte(raw), &payload); err != nil {
+		return "", err
+	}
+	b, err := yaml.Marshal(payload)
+	if err != nil {
+		return "", err
+	}
+	return string(b), nil
 }
