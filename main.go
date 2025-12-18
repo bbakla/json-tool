@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"path/filepath"
 
+	"github.com/gin-gonic/gin"
+
 	"json_formatter/handlers"
 )
 
@@ -20,52 +22,67 @@ type PageData struct {
 	Error      string
 }
 
+func render(tmpl *template.Template, c *gin.Context, rawJSON, key, value string) {
+	formatted, matches, keyMatches, err := handlers.Process(rawJSON, key, value)
+	data := PageData{
+		RawInput:   rawJSON,
+		Key:        key,
+		Value:      value,
+		Formatted:  formatted,
+		Matches:    matches,
+		KeyMatches: keyMatches,
+	}
+	if err != nil {
+		data.Error = err.Error()
+	}
+	c.Status(http.StatusOK)
+	c.Header("Content-Type", "text/html; charset=utf-8")
+	if err := tmpl.Execute(c.Writer, data); err != nil {
+		c.String(http.StatusInternalServerError, "template error")
+	}
+}
+
 func main() {
 	tmplPath := filepath.Join("templates", "index.html")
 	tmpl := template.Must(template.ParseFiles(tmplPath))
 
-	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+	r := gin.Default()
+	r.Static("/static", "static")
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		switch r.Method {
-		case http.MethodGet:
-			renderTemplate(w, tmpl, PageData{})
-		case http.MethodPost:
-			if err := r.ParseForm(); err != nil {
-				renderTemplate(w, tmpl, PageData{Error: "failed to parse form"})
-				return
-			}
-			rawJSON := r.FormValue("jsonInput")
-			key := r.FormValue("key")
-			value := r.FormValue("value")
-
-			formatted, matches, keyMatches, err := handlers.Process(rawJSON, key, value)
-			data := PageData{
-				RawInput:   rawJSON,
-				Key:        key,
-				Value:      value,
-				Formatted:  formatted,
-				Matches:    matches,
-				KeyMatches: keyMatches,
-			}
-			if err != nil {
-				data.Error = err.Error()
-			}
-			renderTemplate(w, tmpl, data)
-		default:
-			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+	r.GET("/", func(c *gin.Context) {
+		c.Status(http.StatusOK)
+		c.Header("Content-Type", "text/html; charset=utf-8")
+		if err := tmpl.Execute(c.Writer, PageData{}); err != nil {
+			c.String(http.StatusInternalServerError, "template error")
 		}
 	})
 
-	log.Println("listening on http://localhost:8080")
-	if err := http.ListenAndServe(":8888", nil); err != nil {
-		log.Fatalf("server error: %v", err)
-	}
-}
+	r.NoRoute(func(c *gin.Context) {
+		c.Status(http.StatusOK)
+		c.Header("Content-Type", "text/html; charset=utf-8")
+		if err := tmpl.Execute(c.Writer, PageData{}); err != nil {
+			c.String(http.StatusInternalServerError, "template error")
+		}
+	})
 
-func renderTemplate(w http.ResponseWriter, tmpl *template.Template, data PageData) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	if err := tmpl.Execute(w, data); err != nil {
-		http.Error(w, "template error", http.StatusInternalServerError)
+	r.POST("/format", func(c *gin.Context) {
+		render(tmpl, c, c.PostForm("jsonInput"), c.PostForm("key"), c.PostForm("value"))
+	})
+
+	r.POST("/find/key", func(c *gin.Context) {
+		render(tmpl, c, c.PostForm("jsonInput"), c.PostForm("key"), "")
+	})
+
+	r.POST("/find/value", func(c *gin.Context) {
+		render(tmpl, c, c.PostForm("jsonInput"), "", c.PostForm("value"))
+	})
+
+	r.GET("/healthz", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"status": "ok"})
+	})
+
+	log.Println("listening on http://localhost:8888")
+	if err := r.Run(":8888"); err != nil {
+		log.Fatalf("server error: %v", err)
 	}
 }
