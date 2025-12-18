@@ -1,8 +1,9 @@
 {{define "content"}}
-    <div class="d-flex align-items-center mb-3">
+    <div class="d-flex align-items-center mb-3 justify-content-between">
       <div>
         <h1 class="h3 mb-0 fw-semibold">JSON Formatter & Key Finder</h1>
       </div>
+      <button type="button" id="themeToggle" class="btn btn-outline-secondary btn-sm btn-toggle-theme">Dark mode</button>
     </div>
 
     {{if .Error}}
@@ -115,4 +116,3 @@
       </div>
     </form>
 {{end}}
-

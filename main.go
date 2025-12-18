@@ -150,7 +150,7 @@ func main() {
 
 	r.GET("/healthz", app.handleHealth)
 
-	log.Println("listening on http://localhost:8888")
+	log.Println("listeninng on http://localhost:8888")
 	if err := r.Run(":8888"); err != nil {
 		log.Fatalf("server error: %v", err)
 	}

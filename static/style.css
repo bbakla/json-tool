@@ -1,2 +1,86 @@
-/* Minimal overrides: using Bootstrap + Tailwind for styling. */
-
+:root {
+  --bg: #f8fafc;
+  --card-bg: #ffffff;
+  --text: #0f172a;
+  --muted: #6b7280;
+  --border: #e2e8f0;
+  --pre-bg: #0f172a;
+  --pre-text: #e2e8f9;
+}
+.dark {
+  --bg: #0f172a;
+  --card-bg: #111827;
+  --text: #e5e7eb;
+  --muted: #9ca3af;
+  --border: #1f2937;
+  --pre-bg: #0b1220;
+  --pre-text: #f1f5f9;
+}
+html, body {
+  background-color: var(--bg);
+  color: var(--text) !important;
+}
+main {
+  color: var(--text) !important;
+}
+.bg-slate-50 {
+  background-color: var(--bg) !important;
+}
+pre {
+  margin: 0;
+  background-color: var(--pre-bg);
+  color: var(--pre-text);
+}
+.card {
+  background-color: var(--card-bg);
+  color: var(--text);
+  border-color: var(--border);
+}
+.card-header {
+  background-color: var(--card-bg);
+  border-color: var(--border);
+  color: var(--text) !important;
+}
+.card-header .fw-semibold,
+.card-header span,
+.card-header svg,
+.card-header button,
+.card-header button svg {
+  color: var(--text) !important;
+  fill: var(--text) !important;
+}
+.form-text,
+.text-muted {
+  color: var(--muted) !important;
+}
+.list-group-item {
+  background-color: var(--card-bg);
+  color: var(--text);
+}
+.form-control {
+  background-color: var(--card-bg);
+  color: var(--text);
+  border-color: var(--border);
+}
+.form-control:focus {
+  background-color: var(--card-bg);
+  color: var(--text);
+  border-color: var(--border);
+  box-shadow: none;
+}
+.btn-toggle-theme {
+  min-width: auto;
+  padding: 4px 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+h1,
+.fw-semibold,
+label,
+.card-header,
+.card-header .fw-semibold,
+.card-header span,
+.card-header svg {
+  color: var(--text) !important;
+}

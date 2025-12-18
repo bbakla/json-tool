@@ -32,15 +32,7 @@ Then open `http://localhost:8888`.
 ## Hot reload (Air)
 If you installed Air (configured via `.air.toml`):
 ```bash
-cd /Volumes/External/src/workspace_projects/json_formatter
 air -c .air.toml
-```
-
-## Tests
-Run all tests:
-```bash
-cd /Volumes/External/src/workspace_projects/json_formatter
-go test ./...
 ```
 
 ## Layout
