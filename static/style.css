@@ -96,11 +96,20 @@ textarea.form-control {
   line-height: 1.45;
 }
 .btn-toggle-theme {
-  min-width: auto;
-  padding: 4px 6px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  min-width: 34px;
+  height: 34px;
+  padding: 6px;
+  border-radius: 10px;
+  background-color: var(--card-bg);
+  color: var(--title) !important;
+  border: 1px solid var(--border-strong);
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--border-strong) 40%, transparent);
+}
+.btn-toggle-theme:hover,
+.btn-toggle-theme:focus-visible {
+  background-color: color-mix(in srgb, var(--border-strong) 12%, var(--card-bg));
+  border-color: var(--border-strong);
+  color: var(--title) !important;
 }
 h1,
 .fw-semibold,

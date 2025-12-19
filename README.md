@@ -10,38 +10,18 @@ A small Go + Gin web app that formats JSON, searches keys/values, minifies JSON,
 - Convert JSON to YAML.
 - Copy formatted output to clipboard.
 
-## Endpoints
-- `GET /` – main page.
-- `POST /format` – format JSON (default form action).
-- `POST /minify` – compact JSON.
-- `POST /toyaml` – JSON to YAML.
-- `POST /find/key` – find values for a key.
-- `POST /find/value` – find keys for a value.
-- `POST /extract/key` – extract the key/value(s) as JSON.
-- `GET /healthz` – health check.
-
-## Running
-From the project root:
-```bash
-cd /Volumes/External/src/workspace_projects/json_formatter
-# standard run
-go run .
-```
-Then open `http://localhost:8888`.
-
 ## Hot reload (Air)
 If you installed Air (configured via `.air.toml`):
 ```bash
 air -c .air.toml
 ```
 
-## Layout
-- `main.go`: Gin setup and handlers.
-- `handlers/`: core JSON/YAML logic (format, minify, search, extract).
-- `templates/layout.html`: base template wrapper.
-- `templates/index.html`: page content template.
-
-## Notes
-- Invalid JSON or missing inputs return HTTP 400 while still rendering the page with an error banner.
-- Uses CDN Bootstrap/Tailwind for styling; no local static assets are required.
-
+## Building cross-platform binaries
+Using the provided Makefile from the project root:
+```bash
+make mac      # macOS amd64 and arm64 -> bin/json_formatter-darwin-*
+make windows  # Windows amd64 -> bin/json_formatter-windows-amd64.exe
+make all      # mac + windows
+make clean    # remove bin/ and tmp/app
+```
+Binaries are written to `bin/`. Use the macOS arm64 binary for Apple Silicon and amd64 for Intel Macs.
