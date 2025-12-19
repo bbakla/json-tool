@@ -18,7 +18,7 @@
     <form method="POST" action="/format" class="row g-3 mb-4">
       <div class="col-12 col-lg-6">
         <div class="card shadow-sm h-100">
-          <div class="card-header bg-white fw-semibold">JSON Input</div>
+          <div class="card-header  fw-semibold">JSON Input</div>
           <div class="card-body">
             <div class="mb-3">
               <textarea id="jsonInput" name="jsonInput" rows="16" class="form-control font-mono text-sm shadow-none" placeholder="Paste JSON here">{{.RawInput}}</textarea>
@@ -33,7 +33,7 @@
       </div>
       <div class="col-12 col-lg-6">
         <div class="card shadow-sm h-100">
-          <div class="card-header bg-white d-flex align-items-center justify-content-between">
+          <div class="card-header  d-flex align-items-center justify-content-between">
             <span class="fw-semibold">Formatted JSON</span>
             <button type="button" id="copyFormatted" data-target="formattedOutput" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-1">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
@@ -50,7 +50,7 @@
 
       <div class="col-12 col-lg-6">
         <div class="card shadow-sm h-100">
-          <div class="card-header bg-white fw-semibold">Key search</div>
+          <div class="card-header  fw-semibold">Key search</div>
           <div class="card-body d-flex flex-column gap-3">
             <div>
               <label for="key" class="form-label fw-semibold">Key to find (optional)</label>
@@ -85,7 +85,7 @@
 
       <div class="col-12 col-lg-6">
         <div class="card shadow-sm h-100">
-          <div class="card-header bg-white fw-semibold">Value search</div>
+          <div class="card-header  fw-semibold">Value search</div>
           <div class="card-body d-flex flex-column gap-3">
             <div>
               <label for="value" class="form-label fw-semibold">Value to find (optional)</label>
@@ -107,7 +107,7 @@
                   {{end}}
                 </ul>
               {{else}}
-                <p class="text-muted mb-1">No keys matched that value.</p>
+                <p class="text-muted mb-1">Ndo keys matched that value.</p>
                 <p class="text-muted small mb-0">Enter a value to search (exact match).</p>
               {{end}}
             </div>
