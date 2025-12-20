@@ -10,6 +10,10 @@ A small Go + Gin web app that formats JSON, searches keys/values, minifies JSON,
 - Convert JSON to YAML.
 - Copy formatted output to clipboard.
 
+It has dark and light themes:
+![Light Theme](doc/light-mode.png)
+![Dark Theme](doc/dark-mode.png)
+
 ## Hot reload (Air)
 If you installed Air (configured via `.air.toml`):
 ```bash
