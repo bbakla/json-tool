@@ -8,6 +8,11 @@
   --pre-bg: #0f172a;
   --pre-text: #e2e8f9;
   --title: #0b1220;
+  --tree-key: #0ea5e9;
+  --tree-string: #10b981;
+  --tree-number: #f59e0b;
+  --tree-null: #ef4444;
+  --tree-bg: rgba(15, 23, 42, 0.04);
 }
 .dark {
   --bg: #0b1220;
@@ -19,6 +24,11 @@
   --pre-bg: #0d1628;
   --pre-text: #e2e8f0;
   --title: #f8fafc;
+  --tree-key: #7dd3fc;
+  --tree-string: #6ee7b7;
+  --tree-number: #fbbf24;
+  --tree-null: #fca5a5;
+  --tree-bg: rgba(255, 255, 255, 0.03);
 }
 html, body {
   background-color: var(--bg);
@@ -40,13 +50,16 @@ pre {
   top: 10px;
   right: 10px;
   padding: 6px;
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: 8px;
   backdrop-filter: blur(6px);
+}
+.copy-btn .copy-label {
+  display: none;
 }
 .copy-btn svg {
   pointer-events: none;
@@ -95,28 +108,66 @@ textarea.form-control {
   min-height: 320px;
   line-height: 1.45;
 }
-.btn-toggle-theme {
-  min-width: 34px;
-  height: 34px;
-  padding: 6px;
-  border-radius: 10px;
-  background-color: var(--card-bg);
+.view-toggle .btn.active {
+  background-color: color-mix(in srgb, var(--border-strong) 16%, var(--card-bg));
   color: var(--title) !important;
+}
+.formatted-tree {
+  background: var(--tree-bg);
   border: 1px solid var(--border-strong);
-  box-shadow: 0 2px 6px color-mix(in srgb, var(--border-strong) 40%, transparent);
+  border-radius: 10px;
+  padding: 12px;
+  min-height: 320px;
+  max-height: 520px;
+  overflow: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.9rem;
 }
-.btn-toggle-theme:hover,
-.btn-toggle-theme:focus-visible {
-  background-color: color-mix(in srgb, var(--border-strong) 12%, var(--card-bg));
-  border-color: var(--border-strong);
-  color: var(--title) !important;
+.json-tree-root {
+  display: block;
 }
-h1,
-.fw-semibold,
-label,
-.card-header,
-.card-header .fw-semibold,
-.card-header span,
-.card-header svg {
-  color: var(--title) !important;
+.json-node {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 2px 0;
+}
+.json-toggle {
+  border: 1px solid var(--border-strong);
+  background: var(--card-bg);
+  color: var(--text);
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+.json-toggle:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--border-strong) 60%, transparent);
+  outline-offset: 2px;
+}
+.json-key {
+  color: var(--tree-key);
+  font-weight: 600;
+}
+.json-value {
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.json-string {
+  color: var(--tree-string);
+}
+.json-primitive {
+  color: var(--tree-number);
+}
+.json-null {
+  color: var(--tree-null);
+}
+.json-children {
+  width: 100%;
 }
