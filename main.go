@@ -1,10 +1,10 @@
 package main
 
 import (
+	"embed"
 	"html/template"
 	"log"
 	"net/http"
-	"path/filepath"
 
 	"github.com/gin-gonic/gin"
 
@@ -25,6 +25,38 @@ type PageData struct {
 // App encapsulates dependencies for HTTP handlers.
 type App struct {
 	tmpl *template.Template
+}
+
+//go:embed templates/*.html
+var tmplFS embed.FS
+
+//go:embed static/*
+var staticFS embed.FS
+
+func main() {
+	tmpl := template.Must(template.ParseFS(tmplFS, "templates/layout.html", "templates/index.html"))
+
+	app := &App{tmpl: tmpl}
+
+	r := gin.Default()
+	r.StaticFS("/static", http.FS(staticFS))
+
+	r.GET("/", app.handleIndex)
+	r.NoRoute(app.handleIndex)
+
+	r.POST("/format", app.handleFormat)
+	r.POST("/find/key", app.handleFindKey)
+	r.POST("/find/value", app.handleFindValue)
+	r.POST("/minify", app.handleMinify)
+	r.POST("/toyaml", app.handleToYAML)
+	r.POST("/extract/key", app.handleExtractKey)
+
+	r.GET("/healthz", app.handleHealth)
+
+	log.Println("listeninng on http://localhost:8888")
+	if err := r.Run(":8888"); err != nil {
+		log.Fatalf("server error: %v", err)
+	}
 }
 
 func (a *App) renderPage(c *gin.Context, data PageData, status int) {
@@ -126,32 +158,4 @@ func (a *App) handleExtractKey(c *gin.Context) {
 
 func (a *App) handleHealth(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "ok"})
-}
-
-func main() {
-	tmplPath := filepath.Join("templates", "layout.html")
-	contentPath := filepath.Join("templates", "index.html")
-	tmpl := template.Must(template.ParseFiles(tmplPath, contentPath))
-
-	app := &App{tmpl: tmpl}
-
-	r := gin.Default()
-	r.Static("/static", "static")
-
-	r.GET("/", app.handleIndex)
-	r.NoRoute(app.handleIndex)
-
-	r.POST("/format", app.handleFormat)
-	r.POST("/find/key", app.handleFindKey)
-	r.POST("/find/value", app.handleFindValue)
-	r.POST("/minify", app.handleMinify)
-	r.POST("/toyaml", app.handleToYAML)
-	r.POST("/extract/key", app.handleExtractKey)
-
-	r.GET("/healthz", app.handleHealth)
-
-	log.Println("listeninng on http://localhost:8888")
-	if err := r.Run(":8888"); err != nil {
-		log.Fatalf("server error: %v", err)
-	}
 }
