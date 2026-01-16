@@ -2,9 +2,13 @@ package main
 
 import (
 	"embed"
+	"fmt"
 	"html/template"
+	"io/fs"
 	"log"
 	"net/http"
+	"os"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 
@@ -39,7 +43,18 @@ func main() {
 	app := &App{tmpl: tmpl}
 
 	r := gin.Default()
-	r.StaticFS("/static", http.FS(staticFS))
+	staticContent, err := fs.Sub(staticFS, "static")
+	if err != nil {
+		log.Fatalf("static FS error: %v", err)
+	}
+	r.GET("/static/*filepath", func(c *gin.Context) {
+		file := strings.TrimPrefix(c.Param("filepath"), "/")
+		if file == "" {
+			c.Status(http.StatusNotFound)
+			return
+		}
+		c.FileFromFS(file, http.FS(staticContent))
+	})
 
 	r.GET("/", app.handleIndex)
 	r.NoRoute(app.handleIndex)
@@ -53,8 +68,15 @@ func main() {
 
 	r.GET("/healthz", app.handleHealth)
 
-	log.Println("listeninng on http://localhost:8888")
-	if err := r.Run(":8888"); err != nil {
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8888"
+	}
+	if port[0] != ':' {
+		port = ":" + port
+	}
+	log.Println(fmt.Sprintf("listening on http://localhost%s", port))
+	if err := r.Run(port); err != nil {
 		log.Fatalf("server error: %v", err)
 	}
 }

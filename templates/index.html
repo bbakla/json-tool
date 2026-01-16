@@ -39,8 +39,8 @@
           <div class="card-body">
             <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
               <div class="btn-group btn-group-sm view-toggle" role="group" aria-label="Formatted view toggle">
-                <button type="button" class="btn btn-outline-secondary active" data-view="tree">Tree</button>
-                <button type="button" class="btn btn-outline-secondary" data-view="raw">Raw</button>
+                <button type="button" class="btn btn-outline-secondary" data-view="tree">Tree</button>
+                <button type="button" class="btn btn-outline-secondary active" data-view="raw">Raw</button>
               </div>
               <button type="button" id="copyFormatted" data-target="formattedOutput" class="copy-btn btn btn-outline-secondary btn-sm d-inline-flex align-items-center justify-content-center" aria-label="Copy formatted JSON">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
@@ -51,8 +51,8 @@
               </button>
             </div>
             <div class="position-relative">
-              <div id="formattedTree" class="formatted-tree"></div>
-              <pre id="formattedOutput" class="font-mono text-sm bg-slate-900 text-slate-100 rounded p-3 border border-slate-800 whitespace-pre-wrap overflow-auto d-none" style="min-height: 320px; max-height: 520px;">{{.Formatted}}</pre>
+              <div id="formattedTree" class="formatted-tree d-none"></div>
+              <pre id="formattedOutput" class="font-mono text-sm bg-slate-900 text-slate-100 rounded p-3 border border-slate-800 whitespace-pre-wrap overflow-auto" style="min-height: 320px; max-height: 520px;">{{.Formatted}}</pre>
             </div>
           </div>
         </div>

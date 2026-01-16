@@ -19,14 +19,24 @@
     }
   };
 
+  // Default to showing the raw formatted JSON if there is content, so users immediately see the result text.
+  const setInitialView = () => {
+    const hasFormatted = rawPre && rawPre.textContent.trim().length > 0;
+    setView(hasFormatted ? 'raw' : 'tree');
+  };
+
   toggleBtns.forEach((btn) => {
     btn.addEventListener('click', () => setView(btn.getAttribute('data-view')));
   });
+
+  setInitialView();
 
   let data;
   try {
     data = JSON.parse(rawPre ? rawPre.textContent : '');
   } catch (e) {
+    // Show the raw pane so the user can see the text even if parsing fails.
+    setView('raw');
     container.textContent = 'Invalid JSON';
     return;
   }
@@ -81,10 +91,22 @@
         toggle.textContent = collapsed ? '▸' : '▾';
         childrenWrapper.style.display = collapsed ? 'none' : 'block';
       };
-      toggle.addEventListener('click', () => {
+      const flip = () => {
         collapsed = !collapsed;
         updateToggle();
+      };
+      toggle.addEventListener('click', () => flip());
+      toggle.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          flip();
+        }
       });
+      node.addEventListener('click', (e) => {
+        if (e.target === toggle || e.target.closest('.json-toggle')) return;
+        flip();
+      });
+      childrenWrapper.addEventListener('click', (e) => e.stopPropagation());
       updateToggle();
     }
 
@@ -95,4 +117,3 @@
   container.innerHTML = '';
   container.appendChild(treeEl);
 })();
-

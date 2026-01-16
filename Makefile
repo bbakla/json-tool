@@ -1,9 +1,12 @@
 APP_NAME := json_formatter
 BIN_DIR := bin
 
-.PHONY: all mac windows clean
+.PHONY: all mac windows clean air
 
 all: mac windows
+
+air:
+	air -c .air.toml
 
 mac: | $(BIN_DIR)
 	GOOS=darwin GOARCH=amd64 go build -o $(BIN_DIR)/$(APP_NAME)-darwin-amd64 .
