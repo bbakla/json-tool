@@ -155,9 +155,13 @@ textarea.form-control {
   margin-top: 0;
   margin-right: 10px;
 }
-.json-toggle:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--border-strong) 60%, transparent);
-  outline-offset: 2px;
+.json-toggle-leaf {
+  border: none;
+  background: transparent;
+  width: 0;
+  height: 0;
+  padding: 0;
+  margin: 0;
 }
 .json-key {
   color: var(--tree-key);

@@ -59,7 +59,12 @@
     toggle.type = 'button';
     toggle.className = 'json-toggle';
     toggle.setAttribute('aria-label', hasChildren ? 'Toggle' : 'Leaf');
-    toggle.textContent = hasChildren ? '▾' : '•';
+    toggle.textContent = hasChildren ? '▾' : '';
+    if (!hasChildren) {
+      toggle.classList.add('json-toggle-leaf');
+      toggle.setAttribute('aria-hidden', 'true');
+      toggle.tabIndex = -1;
+    }
 
     const keyEl = document.createElement('span');
     keyEl.className = 'json-key';
