@@ -44,11 +44,14 @@
   const treeEl = document.createElement('div');
   treeEl.className = 'json-tree-root';
 
+  const cssIndent = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--tree-indent'), 10);
+  const INDENT = Number.isFinite(cssIndent) && cssIndent > 0 ? cssIndent : 12;
+
   const createNode = (key, value, depth) => {
     const type = Array.isArray(value) ? 'array' : value === null ? 'null' : typeof value;
     const node = document.createElement('div');
     node.className = 'json-node';
-    node.style.marginLeft = depth * 16 + 'px';
+    node.style.paddingLeft = depth > 0 ? depth * INDENT + 'px' : '0px';
 
     const hasChildren = type === 'object' || type === 'array';
 

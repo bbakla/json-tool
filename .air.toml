@@ -5,7 +5,7 @@ tmp_dir = "./tmp"
 [build]
   cmd = "go build -o ./tmp/app"
   bin = "./tmp/app"
-  include_ext = ["go", "tpl", "tmpl", "html"]
+  include_ext = ["go", "tpl", "tmpl", "html", "css"]
   exclude_dir = ["tmp", "vendor"]
   delay = 100
 

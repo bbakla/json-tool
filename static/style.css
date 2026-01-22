@@ -13,6 +13,7 @@
   --tree-number: #f59e0b;
   --tree-null: #ef4444;
   --tree-bg: rgba(15, 23, 42, 0.04);
+  --tree-indent: 12px;
 }
 .dark {
   --bg: #0b1220;
@@ -29,6 +30,7 @@
   --tree-number: #fbbf24;
   --tree-null: #fca5a5;
   --tree-bg: rgba(255, 255, 255, 0.03);
+  --tree-indent: 12px;
 }
 html, body {
   background-color: var(--bg);
@@ -122,29 +124,36 @@ textarea.form-control {
   overflow: auto;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 0.9rem;
+  line-height: 1.35;
 }
 .json-tree-root {
   display: block;
 }
 .json-node {
-  display: flex;
   align-items: flex-start;
-  gap: 6px;
-  padding: 2px 0;
+  gap: 4px;
+  padding: 8px 0;
+}
+.json-indent {
+  flex: 0 0 auto;
+  width: 0;
+  min-width: 0;
 }
 .json-toggle {
-  border: 1px solid var(--border-strong);
+  border: 10px solid var(--border-strong);
   background: var(--card-bg);
   color: var(--text);
-  width: 24px;
-  height: 24px;
+  width: 25px;
+  height: 25px;
   border-radius: 6px;
-  font-size: 12px;
-  line-height: 1;
+  font-size: 18px;
+  #line-height: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0;
+  #padding: 0;
+  margin-top: 0;
+  margin-right: 10px;
 }
 .json-toggle:focus-visible {
   outline: 2px solid color-mix(in srgb, var(--border-strong) 60%, transparent);
